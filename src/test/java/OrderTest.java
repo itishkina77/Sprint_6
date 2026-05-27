@@ -3,16 +3,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import pageObject.AboutRentPage;
-import pageObject.MainPage;
-import pageObject.OrderPage;
+import pageobject.AboutRentPage;
+import pageobject.MainPage;
+import pageobject.OrderPage;
 
 import java.time.Duration;
 import java.util.stream.Stream;
@@ -21,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class OrderTest {
     private WebDriver driver;
+    private MainPage mainPage;  // Объявляем как поле класса
 
     @ParameterizedTest
     @MethodSource("orderTestDataProvider")
@@ -30,7 +27,6 @@ public class OrderTest {
                               String metro, String phone, String date, String comment) {
         setUp(browser);
 
-        MainPage mainPage = new MainPage(driver);
         OrderPage orderPage = new OrderPage(driver);
         AboutRentPage aboutRentPage = new AboutRentPage(driver);
 
@@ -101,19 +97,10 @@ public class OrderTest {
         }
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
         driver.get("https://qa-scooter.education-services.ru/");
-        closeCookieConsent();
-    }
 
-    private void closeCookieConsent() {
-        try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-            WebElement cookieButton = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.xpath(".//button[@class='App_CookieButton__3cvqF']")
-            ));
-            cookieButton.click();
-        } catch (Exception e) {
-            System.out.println("Не удалось закрыть куки: " + e.getMessage());
-        }
+        // Создаём MainPage ПОСЛЕ инициализации driver
+        mainPage = new MainPage(driver);
+        mainPage.closeCookieConsent();
     }
 
     @AfterEach
